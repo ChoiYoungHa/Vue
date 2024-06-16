@@ -14,30 +14,47 @@
   </head>
   <body>
     <header>
-      <h1>Monster Slayer</h1>
+      <h1>포켓몬 사냥</h1>
     </header>
     <div id="game">
       <section id="monster" class="container">
-        <h2>Monster Health</h2>
+        <h2>포켓몬 체력</h2>
         <div class="healthbar">
-          <div class="healthbar__value" :style="{width: monsterHealth + '%'}"></div>
+          <div class="healthbar__value" :style="monsterBarStyle"></div>
         </div>
       </section>
       <section id="player" class="container">
-        <h2>Your Health</h2>
+        <h2>나의 체력</h2>
         <div class="healthbar">
-          <div class="healthbar__value" :style="{width: playerHealth + '%'}"></div>
+          <div class="healthbar__value" :style="playerBarStyle"></div>
         </div>
       </section>
-      <section id="controls">
-        <button @click="attackMonster">ATTACK</button>
-        <button>SPECIAL ATTACK</button>
-        <button>HEAL</button>
-        <button>SURRENDER</button>
+      <section id="container" v-if="winner">
+          <h2>Game Over!</h2>
+          <h3 v-if="winner === 'player'">당신이 이겼습니다!</h3>
+          <h3 v-else-if="winner === 'monster'">안타깝지만 패배..</h3>
+          <h3 v-else>비겼네요!</h3>
+          <button @click="restart">다시하기!</button>
+      </section>
+      <section id="controls" v-else>
+        <button @click="attackMonster">공격</button>
+        <button :disabled="mayBeSpeciallUse" @click="specialAttack">특수공격</button>
+        <button @click="playerHeal">회복</button>
+        <button @click="surrender">항복</button>
       </section>
       <section id="log" class="container">
         <h2>Battle Log</h2>
-        <ul></ul>
+        <ul>
+          <li v-for="log in logMessages">
+            <span
+            :class="{'log--player': log.actionBy === 'player','log--monster': log.actionBy === 'monster'}"
+            >{{log.actionBy === 'player' ? 'Player':'Monster'}}</span>
+            <span v-if="log.actionType === 'heal'">힐 사용! <span class="log--heal">{{log.actionValue}}</span></span>
+            <span v-else>
+              상대에게 입힌 데미지 :  <span class="log--damage">{{log.actionValue}}</span>
+            </span>
+          </li>
+        </ul>
       </section>
     </div>
   </body>
